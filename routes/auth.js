@@ -35,20 +35,20 @@ passport.use(new GoogleStrategy({
 
 passport.serializeUser((user, cb) => {
     console.log('Serializing user:', user); // Debug log
-    cb(null, { id: user._id, name: user.name });
+    cb(null, user._id); // Store only the user ID
   });
 
-  passport.deserializeUser(async (user, cb) => {
-    console.log('Deserializing user:', user); // Debug log
-    try {
-      const users = db.collection('users');
-      const dbUser = await users.findOne({ _id: new ObjectId(user.id) });
-      console.log('Found user in DB:', dbUser); // Debug log
-      cb(null, dbUser);
-    } catch (err) {
-      cb(err);
-    }
-  });
+passport.deserializeUser(async (id, cb) => {
+  console.log('Deserializing user ID:', id); // Debug log
+  try {
+    const users = db.collection('users');
+    const dbUser = await users.findOne({ _id: new ObjectId(id) });
+    console.log('Found user in DB:', dbUser); // Debug log
+    cb(null, dbUser);
+  } catch (err) {
+    cb(err);
+  }
+});
 
 // Route to initiate Google login
 router.get('/login/federated/google', passport.authenticate('google'));
@@ -65,5 +65,7 @@ router.post('/logout', (req, res, next) => {
     res.redirect('/');
   });
 });
+
+
 
 export default router;
