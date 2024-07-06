@@ -2,3 +2,10 @@ extends layout
 
 block content
   h1= title
+  p Welcome to #{title}
+  if user
+    p Welcome #{user.name}
+    form(action='/auth/logout', method='post')
+      button(type='submit') Logout
+  else
+    a(href='/auth/login/federated/google', class='btn btn-primary') Login with Google
